@@ -63,9 +63,28 @@ Hai điểm mù có bằng chứng:
 
 Ngoài ra, pipeline vẫn còn 34/193 ảnh cảnh báo sau 80 lượt review, cho thấy AutoQC chưa thay thế hoàn toàn kiểm tra của con người.
 
-## 5. Train: raw vs clean (tùy chọn)
+## 5. Train: raw vs clean (15 điểm riêng)
 
-**Chưa chạy.** Phần huấn luyện raw và clean trên Colab được chấm riêng; hiện chưa có kết quả mAP50, seed hoặc độ lệch chuẩn để so sánh. Vì vậy chưa thể kết luận dataset clean cải thiện hiệu năng mô hình.
+Đã hoàn thành huấn luyện trên Google Colab với GPU NVIDIA Tesla T4, mô hình YOLO26n (`yolo26n.pt`), 20 epoch, 2 seed (0 và 1), cùng tập validation 40 ảnh và tập test 100 ảnh. Hai biến thể sử dụng cùng cấu hình huấn luyện, chỉ khác dữ liệu train: Raw gồm 224 ảnh, Clean gồm 193 ảnh.
+
+| Biến thể | Ảnh train | Seed | mAP50 (TB ± độ lệch) | mAP50-95 | Precision | Recall |
+|---|---:|---:|---|---|---|---|
+| Raw | 224 | 2 | 0.726 ± 0.000 | 0.512 ± 0.004 | 0.764 ± 0.061 | 0.649 ± 0.028 |
+| Clean | 193 | 2 | 0.729 ± 0.002 | 0.500 ± 0.000 | 0.794 ± 0.028 | 0.619 ± 0.005 |
+
+**Chênh lệch mAP50 (Clean − Raw): +0.004**, tương đương khoảng +0,4 điểm phần trăm. Mức cải thiện nhỏ và cần được xem xét cùng độ dao động giữa các seed. Precision tăng khoảng 0.030, nhưng Recall giảm 0.030 và mAP50-95 giảm 0.012.
+
+**Phân tích theo lớp:** Trung bình hai seed, Clean tăng AP50 ở Car (khoảng +0.0155), Person (+0.0056), Bus (+0.0203), nhưng giảm ở Truck (khoảng −0.0270). Do đó, tác động của việc làm sạch không đồng đều giữa các lớp.
+
+**Giả thuyết và cách kiểm chứng:**
+
+1. Việc loại 31 ảnh và sửa nhãn có thể giảm nhiễu dữ liệu, giúp Precision tăng. Cần kiểm tra từng nhóm ảnh bị loại, đối chiếu lỗi nhãn trước/sau và chạy thêm seed để xác nhận.
+2. Việc giảm số ảnh train từ 224 xuống 193 có thể làm mất một số ví dụ hữu ích, đặc biệt ở lớp Truck, khiến Recall hoặc AP50 giảm. Cần thống kê số đối tượng theo lớp trước/sau và đánh giá trên nhiều tập test.
+3. Tập test chỉ gồm 100 ảnh nên kết quả có thể nhạy với mẫu dữ liệu. Cần đánh giá thêm trên tập test độc lập và tăng số seed.
+
+**Kết luận:** Clean có mAP50 và Precision trung bình cao hơn Raw nhưng mAP50-95 và Recall thấp hơn. Với 2 seed, mức chênh lệch mAP50 nhỏ, chưa đủ bằng chứng khẳng định Clean cải thiện hiệu năng ổn định. Pipeline vẫn giữ quyết định HOLD do 34/193 ảnh còn cảnh báo (17,62%).
+
+**Minh chứng:** `submission/results/raw_seed0.json`, `raw_seed1.json`, `clean_seed0.json`, `clean_seed1.json`, `comparison.json`, `comparison.md`, `comparison.png`.
 
 ## 6. Quyết định và ghi chú AI
 
