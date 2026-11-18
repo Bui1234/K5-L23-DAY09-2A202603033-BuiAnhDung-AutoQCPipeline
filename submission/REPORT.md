@@ -63,7 +63,7 @@ Hai điểm mù có bằng chứng:
 
 Ngoài ra, pipeline vẫn còn 34/193 ảnh cảnh báo sau 80 lượt review, cho thấy AutoQC chưa thay thế hoàn toàn kiểm tra của con người.
 
-## 5. Train: raw vs clean (15 điểm riêng)
+## 5. Train: raw vs clean (tùy chọn, chấm riêng)
 
 Đã hoàn thành huấn luyện trên Google Colab với GPU NVIDIA Tesla T4, mô hình YOLO26n (`yolo26n.pt`), 20 epoch, 2 seed (0 và 1), cùng tập validation 40 ảnh và tập test 100 ảnh. Hai biến thể sử dụng cùng cấu hình huấn luyện, chỉ khác dữ liệu train: Raw gồm 224 ảnh, Clean gồm 193 ảnh.
 
